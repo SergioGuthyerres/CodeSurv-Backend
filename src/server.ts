@@ -1,6 +1,10 @@
 import Fastify from "fastify";
-
+import cors from "@fastify/cors";
 const fastify = Fastify({ logger: true });
+
+fastify.register(cors, {
+  origin: "http://localhost:5173",
+});
 
 fastify.get("/", async (request, reply) => {
   return { status: "Backend do CodeSurv operante!" };
