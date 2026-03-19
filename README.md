@@ -185,8 +185,8 @@ As salas vivem em memória no processo Node.js. Estrutura de cada sala:
 7. Na última rodada: emite `game:end`, persiste no MongoDB
 
 **Pontuação por rodada:**
-- Acerto: 100 pontos base
-- Bônus de velocidade: até 50 pontos proporcionais ao tempo restante
+- Acerto: 10 pontos base
+- Bônus de velocidade: até 10 pontos extras proporcionais a quantidade de pessoas que já acertaram (mínimo de 2 pontos extras)
 - Erro ou timeout: 0 pontos
 
 **Cotas:**
@@ -203,9 +203,7 @@ As salas vivem em memória no processo Node.js. Estrutura de cada sala:
 ## Scripts disponíveis
 
 ```bash
-npm run dev      # Inicia com nodemon (hot reload)
-npm run start    # Inicia em produção
-npm run lint     # Roda o ESLint
+npm run dev      # Inicia com npx watch (hot reload)
 ```
 
 ---
@@ -245,4 +243,4 @@ npm run lint     # Roda o ESLint
 
 ## Relacionado
 
-- [codesurv-frontend](https://github.com/seu-usuario/codesurv-frontend) — interface React do jogador
+- [codesurv-frontend](https://github.com/SergioGuthyerres/CodeSurv-Frontend.git) — interface React do jogador
