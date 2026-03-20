@@ -1,23 +1,18 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-const fastify = Fastify({ logger: true });
 
-fastify.register(cors, {
-  origin: "http://localhost:5173",
+import { Server } from "socket.io";
+const PORT = 3000;
+async function start() {
+  const fastify = Fastify({ logger: true });
+
+  const io = new Server(fastify.server, {
+    cors: { origin: "http://localhost/3000" },
+  });
+
+  await fastify.listen({ port: PORT });
+}
+start().catch((err) => {
+  console.log(err);
+  process.exit(1);
 });
-
-fastify.get("/", async (request, reply) => {
-  return { status: "Backend do CodeSurv operante!" };
-});
-// depois irei refatorar para encaixar o socket.io
-const start = async () => {
-  try {
-    await fastify.listen({ port: 3000 });
-    console.log("Servidor rodando na porta 3000");
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
-};
-
-start();

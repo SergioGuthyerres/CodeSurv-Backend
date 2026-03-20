@@ -14,13 +14,13 @@ O estado das salas ativas é mantido **em memória** (Map JavaScript) — sem de
 
 ## Stack
 
-| Tecnologia | Versão | Uso |
-|---|---|---|
-| Node.js | 20+ | Runtime |
-| Fastify | 4+ | Servidor HTTP / API REST |
-| Socket.IO | 4+ | Comunicação em tempo real |
-| MongoDB | Atlas | Persistência de partidas |
-| Mongoose | 8+ | ODM / schemas |
+| Tecnologia | Versão | Uso                       |
+| ---------- | ------ | ------------------------- |
+| Node.js    | 20+    | Runtime                   |
+| Fastify    | 4+     | Servidor HTTP / API REST  |
+| Socket.IO  | 4+     | Comunicação em tempo real |
+| MongoDB    | Atlas  | Persistência de partidas  |
+| Mongoose   | 8+     | ODM / schemas             |
 
 ---
 
@@ -120,28 +120,28 @@ server.js
 
 ## Endpoints REST
 
-| Método | Rota | Auth | Descrição |
-|---|---|---|---|
-| `GET` | `/api/rooms` | Não | Lista salas públicas disponíveis |
-| `GET` | `/api/rooms/:code` | Não | Retorna detalhes de uma sala pelo código |
-| `GET` | `/api/challenges/:id` | Não | Retorna um desafio pelo ID (Fase 1) |
-| `POST` | `/api/auth/register` | Não | Cadastro de usuário (Fase 2) |
-| `POST` | `/api/auth/login` | Não | Login e geração de token JWT (Fase 2) |
+| Método | Rota                  | Auth | Descrição                                |
+| ------ | --------------------- | ---- | ---------------------------------------- |
+| `GET`  | `/api/rooms`          | Não  | Lista salas públicas disponíveis         |
+| `GET`  | `/api/rooms/:code`    | Não  | Retorna detalhes de uma sala pelo código |
+| `GET`  | `/api/challenges/:id` | Não  | Retorna um desafio pelo ID (Fase 1)      |
+| `POST` | `/api/auth/register`  | Não  | Cadastro de usuário (Fase 2)             |
+| `POST` | `/api/auth/login`     | Não  | Login e geração de token JWT (Fase 2)    |
 
 ---
 
 ## Eventos Socket.IO
 
-| Evento | Direção | Payload | Descrição |
-|---|---|---|---|
-| `room:create` | Recebe | `{ username, config }` | Cria nova sala, retorna código gerado |
-| `room:join` | Recebe | `{ roomCode, username }` | Adiciona jogador à sala |
-| `room:update` | Emite | `{ players, status }` | Atualiza estado do lobby para todos |
-| `game:start` | Emite | `{ challenge, duration }` | Inicia turno com desafio e timer |
-| `game:submit` | Recebe | `{ code, roomCode }` | Recebe solução do jogador |
-| `game:result` | Emite | `{ scores, correct[] }` | Resultado do turno para todos |
-| `game:end` | Emite | `{ podium }` | Encerra partida com pódio final |
-| `room:disconnect` | Emite | `{ username }` | Notifica saída de jogador |
+| Evento            | Direção | Payload                   | Descrição                             |
+| ----------------- | ------- | ------------------------- | ------------------------------------- |
+| `room:create`     | Recebe  | `{ username, config }`    | Cria nova sala, retorna código gerado |
+| `room:join`       | Recebe  | `{ roomCode, username }`  | Adiciona jogador à sala               |
+| `room:update`     | Emite   | `{ players, status }`     | Atualiza estado do lobby para todos   |
+| `game:start`      | Emite   | `{ challenge, duration }` | Inicia turno com desafio e timer      |
+| `game:submit`     | Recebe  | `{ code, roomCode }`      | Recebe solução do jogador             |
+| `game:result`     | Emite   | `{ scores, correct[] }`   | Resultado do turno para todos         |
+| `game:end`        | Emite   | `{ podium }`              | Encerra partida com pódio final       |
+| `room:disconnect` | Emite   | `{ username }`            | Notifica saída de jogador             |
 
 ---
 
@@ -176,6 +176,7 @@ As salas vivem em memória no processo Node.js. Estrutura de cada sala:
 ## Regras de negócio
 
 **Ciclo de um turno:**
+
 1. Host emite `game:start`
 2. Server seleciona desafio, inicia `setTimeout` com a duração configurada
 3. Jogadores enviam `game:submit` com suas soluções
@@ -185,15 +186,18 @@ As salas vivem em memória no processo Node.js. Estrutura de cada sala:
 7. Na última rodada: emite `game:end`, persiste no MongoDB
 
 **Pontuação por rodada:**
+
 - Acerto: 10 pontos base
 - Bônus de velocidade: até 10 pontos extras proporcionais a quantidade de pessoas que já acertaram (mínimo de 2 pontos extras)
 - Erro ou timeout: 0 pontos
 
 **Cotas:**
+
 - Máximo de 1 sala ativa por socket/usuário
 - Garbage collector remove salas com `lastActivity` maior que 10 minutos
 
 **Segurança na avaliação de scripts:**
+
 - Scripts nunca rodam no processo principal
 - Execução em sandbox (vm2 ou Worker Thread)
 - Timeout máximo de 2 segundos por submissão
@@ -210,10 +214,10 @@ npm run dev      # Inicia com npx watch (hot reload)
 
 ## Variáveis de ambiente
 
-| Variável | Descrição | Exemplo |
-|---|---|---|
-| `PORT` | Porta do servidor | `3001` |
-| `MONGO_URI` | URI de conexão do MongoDB Atlas | `mongodb+srv://...` |
+| Variável     | Descrição                              | Exemplo                      |
+| ------------ | -------------------------------------- | ---------------------------- |
+| `PORT`       | Porta do servidor                      | `3001`                       |
+| `MONGO_URI`  | URI de conexão do MongoDB Atlas        | `mongodb+srv://...`          |
 | `JWT_SECRET` | Chave secreta para tokens JWT (Fase 2) | `uma-string-longa-e-secreta` |
 
 ---
