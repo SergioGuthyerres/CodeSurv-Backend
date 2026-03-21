@@ -13,9 +13,13 @@ export interface Room {
   currentChallenge: string | null;
   createdAt: Date;
   maxPlayers: number;
+  senha: string | null;
 }
 
-type RoomUpdatableFields = Omit<Room, "code" | "createdAt" | "players">;
+type RoomUpdatableFields = Omit<
+  Room,
+  "code" | "createdAt" | "players" | "senha"
+>;
 
 const rooms = new Map<string, Room>();
 
@@ -24,6 +28,7 @@ export function createRoom(
   socketId: string,
   username: string,
   maxPlayers: number,
+  senha: string | null,
 ): Room {
   const owner: Player = {
     isOwner: true,
@@ -39,6 +44,7 @@ export function createRoom(
     currentChallenge: null,
     createdAt: new Date(),
     maxPlayers,
+    senha,
   };
   rooms.set(code, room);
   return room;
@@ -50,11 +56,14 @@ export function addPlayer(
   code: string,
   socketId: string,
   username: string,
+  senha: string | null,
 ): { success: boolean; error?: string; room?: Room } {
   const room = rooms.get(code);
-
   if (!room) {
     return { success: false, error: "roomNotFound" };
+  }
+  if (room.senha !== null && room.senha !== senha) {
+    return { success: false, error: "incorrectPassword" };
   }
 
   if (room.status !== "waiting") {
