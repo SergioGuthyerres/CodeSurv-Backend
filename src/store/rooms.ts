@@ -18,7 +18,7 @@ export interface Room {
 
 type RoomUpdatableFields = Omit<
   Room,
-  "code" | "createdAt" | "players" | "senha"
+  "code" | "createdAt" | "players" | "password"
 >;
 
 const rooms = new Map<string, Room>();
@@ -56,13 +56,13 @@ export function addPlayer(
   code: string,
   socketId: string,
   username: string,
-  senha: string | null,
-): { success: boolean; error?: string; room?: Room } {
+  password: string | null,
+): { success: true; room: Room } | { success: false; error: string } {
   const room = rooms.get(code);
   if (!room) {
     return { success: false, error: "roomNotFound" };
   }
-  if (room.password !== null && room.password !== senha) {
+  if (room.password !== null && room.password !== password) {
     return { success: false, error: "incorrectPassword" };
   }
 

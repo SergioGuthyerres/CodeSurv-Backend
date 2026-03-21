@@ -5,6 +5,13 @@ import {
   removePlayer,
   roomLen,
 } from "../store/rooms";
+import { Room } from "../store/rooms";
+type CreateRoomResult =
+  | { success: true; room: Room }
+  | { success: false; error: string };
+type JoinRoomResult =
+  | { success: true; room: Room }
+  | { success: false; error: string };
 function usernameValidator(username: string): boolean {
   const trimmed = username.trim();
 
@@ -25,7 +32,7 @@ export function generateRoomCode() {
   }
   let code = generateCode();
   while (getRoom(code)) {
-    //funciona so pra mvp
+    //funciona so pra mvp, depois pensar em como esse loop não crashar o server
     code = generateCode();
   }
   return code;
@@ -36,7 +43,7 @@ export function serviceCreateRoom(
   username: string,
   maxPlayers: number,
   password: string | null,
-) {
+): CreateRoomResult {
   if (maxPlayers < 2 || maxPlayers > 20) {
     return { success: false, error: "invalidMaxPlayers" };
   }
@@ -56,11 +63,12 @@ export function joinRoom(
   socketId: string,
   username: string,
   password: string | null,
-) {
+): JoinRoomResult {
   if (!usernameValidator(username)) {
     return { success: false, error: "invalidUsername" };
   }
-  return addPlayer(code, socketId, username, password);
+  const result = addPlayer(code, socketId, username, password);
+  return result;
 }
 
 export function leaveRoom(socketId: string) {
