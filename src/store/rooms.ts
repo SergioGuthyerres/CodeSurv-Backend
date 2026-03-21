@@ -13,7 +13,7 @@ export interface Room {
   currentChallenge: string | null;
   createdAt: Date;
   maxPlayers: number;
-  senha: string | null;
+  password: string | null;
 }
 
 type RoomUpdatableFields = Omit<
@@ -28,7 +28,7 @@ export function createRoom(
   socketId: string,
   username: string,
   maxPlayers: number,
-  senha: string | null,
+  password: string | null,
 ): Room {
   const owner: Player = {
     isOwner: true,
@@ -44,7 +44,7 @@ export function createRoom(
     currentChallenge: null,
     createdAt: new Date(),
     maxPlayers,
-    senha,
+    password,
   };
   rooms.set(code, room);
   return room;
@@ -62,7 +62,7 @@ export function addPlayer(
   if (!room) {
     return { success: false, error: "roomNotFound" };
   }
-  if (room.senha !== null && room.senha !== senha) {
+  if (room.password !== null && room.password !== senha) {
     return { success: false, error: "incorrectPassword" };
   }
 
