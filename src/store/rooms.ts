@@ -93,7 +93,7 @@ export function removePlayer(socketId: string): {
   for (const room of rooms.values()) {
     const index = room.players.findIndex(
       (player) => player.socketId === socketId,
-    );
+    ); //testar criar um map com os socketId e o index com base na entrada de player em addPlayer nas proximas versões, para o mvp isso aqui funciona
 
     if (index === -1) continue;
 
@@ -126,7 +126,9 @@ export function updateRoom(
 
   return room;
 }
-
+export function roomLen() {
+  return rooms.size;
+}
 export function deleteRoom(code: string): boolean {
   return rooms.delete(code);
 }
