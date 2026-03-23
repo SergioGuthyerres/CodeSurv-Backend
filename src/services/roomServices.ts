@@ -15,7 +15,7 @@ type JoinRoomResult =
 function usernameValidator(username: string): boolean {
   const trimmed = username.trim();
 
-  if (trimmed.length < 1 || trimmed.length > 12) {
+  if (trimmed.length < 4 || trimmed.length > 12) {
     return false;
   }
 
@@ -43,6 +43,8 @@ export function serviceCreateRoom(
   username: string,
   maxPlayers: number,
   password: string | null,
+  timeLimit: number,
+  pointsToWin: number,
 ): CreateRoomResult {
   if (maxPlayers < 2 || maxPlayers > 20) {
     return { success: false, error: "invalidMaxPlayers" };
@@ -53,8 +55,22 @@ export function serviceCreateRoom(
   if (!usernameValidator(username)) {
     return { success: false, error: "invalidUsername" };
   }
+  if (timeLimit > 1000 || timeLimit < 60) {
+    return { success: false, error: "invalidTimeLimt" };
+  }
+  if (pointsToWin > 500 || pointsToWin < 80) {
+    return { success: false, error: "invalidPointsToWin" };
+  }
   const code = generateRoomCode();
-  const room = createRoom(code, socketId, username, maxPlayers, password);
+  const room = createRoom(
+    code,
+    socketId,
+    username,
+    maxPlayers,
+    password,
+    timeLimit,
+    pointsToWin,
+  );
   return { success: true, room };
 }
 

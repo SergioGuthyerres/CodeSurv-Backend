@@ -6,6 +6,8 @@ interface CreateRoomData {
   username: string;
   maxPlayers: number;
   password: string | null;
+  timeLimit: number;
+  pointsToWin: number;
 }
 interface JoinRoomData {
   code: string;
@@ -37,6 +39,8 @@ export function roomHandlers(io: Server, socket: Socket) {
       data.username,
       data.maxPlayers,
       data.password,
+      data.timeLimit,
+      data.pointsToWin,
     );
     if (!result.success) {
       socket.emit("room:error", result.error);

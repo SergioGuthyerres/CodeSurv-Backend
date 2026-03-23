@@ -2,7 +2,6 @@ export interface Player {
   socketId: string;
   username: string;
   score: number;
-  ready: boolean;
   isOwner: boolean;
 }
 
@@ -14,6 +13,8 @@ export interface Room {
   createdAt: Date;
   maxPlayers: number;
   password: string | null;
+  timeLimit: number;
+  pointsToWin: number;
 }
 
 type RoomUpdatableFields = Omit<
@@ -29,13 +30,14 @@ export function createRoom(
   username: string,
   maxPlayers: number,
   password: string | null,
+  timeLimit: number,
+  pointsToWin: number,
 ): Room {
   const owner: Player = {
     isOwner: true,
     socketId,
     username,
     score: 0,
-    ready: false,
   };
   const room: Room = {
     code,
@@ -45,6 +47,8 @@ export function createRoom(
     createdAt: new Date(),
     maxPlayers,
     password,
+    timeLimit,
+    pointsToWin,
   };
   rooms.set(code, room);
   return room;
@@ -67,7 +71,7 @@ export function addPlayer(
   }
 
   if (room.status !== "waiting") {
-    return { success: false, error: "gameAlreadyStarted" };
+    return { success: false, error: "gameAlStarted" };
   }
 
   if (room.players.length >= room.maxPlayers) {
@@ -78,7 +82,6 @@ export function addPlayer(
     socketId,
     username,
     score: 0,
-    ready: false,
   };
   room.players.push(player);
 
