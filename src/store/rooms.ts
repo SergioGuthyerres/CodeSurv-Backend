@@ -3,6 +3,7 @@ export interface Player {
   username: string;
   score: number;
   isOwner: boolean;
+  solvedCurrent: boolean;
 }
 
 export interface Room {
@@ -15,6 +16,8 @@ export interface Room {
   password: string | null;
   timeLimit: number;
   pointsToWin: number;
+  solvedCount: number;
+  roundEndsAt: Date | null;
 }
 
 type RoomUpdatableFields = Omit<
@@ -38,6 +41,7 @@ export function createRoom(
     socketId,
     username,
     score: 0,
+    solvedCurrent: false,
   };
   const room: Room = {
     code,
@@ -48,7 +52,9 @@ export function createRoom(
     maxPlayers,
     password,
     timeLimit,
+    roundEndsAt: null,
     pointsToWin,
+    solvedCount: 0,
   };
   rooms.set(code, room);
   return room;
@@ -82,6 +88,7 @@ export function addPlayer(
     socketId,
     username,
     score: 0,
+    solvedCurrent: false,
   };
   room.players.push(player);
 

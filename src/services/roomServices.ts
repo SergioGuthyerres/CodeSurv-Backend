@@ -48,6 +48,7 @@ export function serviceCreateRoom(
   password: string | null,
   timeLimit: number,
   pointsToWin: number,
+  solvedCount: number,
 ): CreateRoomResult {
   if (typeof maxPlayers !== "number" || maxPlayers < 2 || maxPlayers > 20) {
     return { success: false, error: "invalidMaxPlayers" };

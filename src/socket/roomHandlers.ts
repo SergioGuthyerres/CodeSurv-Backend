@@ -41,6 +41,7 @@ export function roomHandlers(io: Server, socket: Socket) {
       data.password,
       data.timeLimit,
       data.pointsToWin,
+      0,
     );
     if (!result.success) {
       socket.emit("room:error", result.error);
