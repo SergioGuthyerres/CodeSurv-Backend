@@ -27,6 +27,7 @@ function handleLeave(io: Server, socket: Socket) {
     io.to(result.room.code).emit("game:interrupted", { socketId: socket.id });
   }
   io.to(result.room.code).emit("room:userLeft", { socketId: socket.id });
+  io.to(result.room.code).emit("room:updated", result.room)
 }
 export function roomHandlers(io: Server, socket: Socket) {
   socket.on("room:create", (data: CreateRoomData) => {

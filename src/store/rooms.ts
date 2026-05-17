@@ -18,11 +18,12 @@ export interface Room {
   pointsToWin: number;
   solvedCount: number;
   roundEndsAt: Date | null;
+  roundTimer: ReturnType<typeof setTimeout> | null;
 }
 
 type RoomUpdatableFields = Omit<
   Room,
-  "code" | "createdAt" | "players" | "password"
+  "code" | "createdAt" | "password"
 >;
 
 const rooms = new Map<string, Room>();
@@ -55,6 +56,7 @@ export function createRoom(
     roundEndsAt: null,
     pointsToWin,
     solvedCount: 0,
+    roundTimer: null
   };
   rooms.set(code, room);
   return room;

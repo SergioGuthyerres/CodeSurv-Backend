@@ -65,7 +65,7 @@ export function serviceCreateRoom(
   if (
     typeof pointsToWin !== "number" ||
     pointsToWin > 500 ||
-    pointsToWin < 80
+    pointsToWin < 20 //MUDAR PARA 80 ATENCAO ATENCAO ATENCAO ATENCAO ATENCAO ATENCAO _S_AD_SD_SAD__SAD_SA_D_SA_D_
   ) {
     return { success: false, error: "invalidPointsToWin" };
   }
@@ -78,6 +78,7 @@ export function serviceCreateRoom(
     password,
     timeLimit,
     pointsToWin,
+
   );
   return { success: true, room };
 }
