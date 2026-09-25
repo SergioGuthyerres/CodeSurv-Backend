@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Frontend do CodeSurv
+    url: https://github.com/SergioGuthyerres/CodeSurv-Frontend/issues
+    about: Problemas de interface, telas ou navegacao vao no repositorio do frontend.

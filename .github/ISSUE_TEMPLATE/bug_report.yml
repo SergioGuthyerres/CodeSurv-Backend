@@ -1,0 +1,38 @@
+name: Bug
+description: Relatar algo que nao funciona como deveria
+labels: ["bug"]
+body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: O que acontece
+      description: Descreva o comportamento observado.
+    validations:
+      required: true
+
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que deveria acontecer
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproducao
+    attributes:
+      label: Como reproduzir
+      placeholder: |
+        1. Criar uma sala com ...
+        2. Enviar `game:submit` com ...
+        3. O servidor responde ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: ambiente
+    attributes:
+      label: Ambiente
+      placeholder: |
+        - Node: 20.x
+        - MongoDB: local / Atlas
+        - Piston: local / VM
