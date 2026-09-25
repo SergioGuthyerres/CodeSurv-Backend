@@ -1,0 +1,82 @@
+# Sobe as dependencias do CodeSurv-Backend: MongoDB e a sandbox de execucao (Piston).
+#
+#   docker compose up -d          # apenas mongo + piston (fluxo de desenvolvimento)
+#   docker compose --profile app up -d --build   # sobe tambem a API em container
+#
+# Os runtimes de JavaScript e Python sao instalados automaticamente pelo
+# servico piston-init na primeira subida.
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: codesurv-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  piston:
+    image: ghcr.io/engineer-man/piston
+    container_name: codesurv-piston
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "2000:2000"
+    volumes:
+      - piston-data:/piston
+    tmpfs:
+      - /tmp:exec
+
+  # Instala os runtimes na Piston e encerra. Rode de novo com
+  # `docker compose up piston-init` se precisar reinstalar.
+  piston-init:
+    image: curlimages/curl:latest
+    container_name: codesurv-piston-init
+    depends_on:
+      - piston
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "aguardando a Piston responder..."
+        until curl -sf http://piston:2000/api/v2/runtimes > /dev/null; do sleep 2; done
+        echo "instalando javascript 18.15.0..."
+        curl -sS -X POST http://piston:2000/api/v2/packages \
+          -H "Content-Type: application/json" \
+          -d '{"language":"javascript","version":"18.15.0"}'
+        echo "instalando python 3.12.0..."
+        curl -sS -X POST http://piston:2000/api/v2/packages \
+          -H "Content-Type: application/json" \
+          -d '{"language":"python","version":"3.12.0"}'
+        echo "runtimes disponiveis:"
+        curl -sS http://piston:2000/api/v2/runtimes
+
+  # Opcional: a propria API em container. Ative com --profile app.
+  api:
+    profiles: ["app"]
+    build: .
+    container_name: codesurv-api
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      PORT: 3000
+      MONGO_URI: mongodb://mongo:27017/codesurv
+      PISTON_URL: http://piston:2000
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      piston:
+        condition: service_started
+
+volumes:
+  mongo-data:
+  piston-data:
