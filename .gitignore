@@ -1,8 +1,24 @@
-bin/
-obj/
+# Dependencias
 node_modules/
 vendor/
+
+# Build
+bin/
+obj/
+dist/
+*.tsbuildinfo
+
+# Ambiente
 .env
 .env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editores e SO
 .DS_Store
-Thumbs.dbCopied!
+Thumbs.db
+.vscode/
+.idea/
