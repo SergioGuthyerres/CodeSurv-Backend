@@ -1,0 +1,44 @@
+interface Challenge {
+  title: string;
+  description: string;
+  difficulty: "easy" | "medium" | "hard";
+  tags: string[];
+  testCases: {
+    input: any[];
+    expected: any;
+    isPublic: boolean;
+  }[];
+
+  languages: Array<"javascript" | "python">;
+  functionSig: {
+    javascript?: string;
+    python?: string;
+  };
+}
+
+{title: Soma simples, description: "o primeiro desafio do CodeSurv com entrada de dados! Dada dois números inteiros a e b, retorne a soma entre eles.", difficulty: "easy", tags: ["beginner"], testCases: [
+    {input: [1, 2]
+    expected: 3;
+    isPublic: true},
+    {input: [-3, -2]
+    expected: -5;
+    isPublic: true},
+    {input: [100, -2]
+    expected: 98;
+    isPublic: true},
+    {input: [1, 0]
+    expected: 1;
+    isPublic: false},
+    {input: [0, 0]
+    expected: 0;
+    isPublic: false},
+    {input: [0, 1]
+    expected: 1;
+    isPublic: false},
+    ],
+    languages: ["javascript", "python"],
+    functionSig: {
+        javascript: "function solve(a, b){",
+        python: "def solve(a, b):\n "
+    };
+    }

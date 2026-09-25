@@ -21,10 +21,17 @@ export interface Room {
   roundTimer: ReturnType<typeof setTimeout> | null;
 }
 
-type RoomUpdatableFields = Omit<
-  Room,
-  "code" | "createdAt" | "password"
->;
+export interface PublicRoom {
+  code: string;
+  playerCount: number;
+  maxPlayers: number;
+  isPrivate: boolean;
+  timeLimit: number;
+  pointsToWin: number;
+  status: "waiting" | "playing" | "finished";
+}
+
+type RoomUpdatableFields = Omit<Room, "code" | "createdAt" | "password">;
 
 const rooms = new Map<string, Room>();
 
@@ -36,6 +43,7 @@ export function createRoom(
   password: string | null,
   timeLimit: number,
   pointsToWin: number,
+  solvedCount: number,
 ): Room {
   const owner: Player = {
     isOwner: true,
@@ -55,15 +63,31 @@ export function createRoom(
     timeLimit,
     roundEndsAt: null,
     pointsToWin,
-    solvedCount: 0,
-    roundTimer: null
+    solvedCount,
+    roundTimer: null,
   };
   rooms.set(code, room);
   return room;
 }
+
 export function getRoom(code: string): Room | undefined {
   return rooms.get(code);
 }
+
+export function getRoomsPublic(): PublicRoom[] {
+  return Array.from(rooms.values())
+    .filter((r) => r.status === "waiting")
+    .map((r) => ({
+      code: r.code,
+      playerCount: r.players.length,
+      maxPlayers: r.maxPlayers,
+      isPrivate: r.password !== null,
+      timeLimit: r.timeLimit,
+      pointsToWin: r.pointsToWin,
+      status: r.status,
+    }));
+}
+
 export function addPlayer(
   code: string,
   socketId: string,
@@ -71,17 +95,13 @@ export function addPlayer(
   password: string | null,
 ): { success: true; room: Room } | { success: false; error: string } {
   const room = rooms.get(code);
-  if (!room) {
-    return { success: false, error: "roomNotFound" };
-  }
+  if (!room) return { success: false, error: "roomNotFound" };
   if (room.password !== null && room.password !== password) {
     return { success: false, error: "incorrectPassword" };
   }
-
   if (room.status !== "waiting") {
-    return { success: false, error: "gameAlStarted" };
+    return { success: false, error: "gameAlreadyStarted" };
   }
-
   if (room.players.length >= room.maxPlayers) {
     return { success: false, error: "roomFull" };
   }
@@ -93,7 +113,6 @@ export function addPlayer(
     solvedCurrent: false,
   };
   room.players.push(player);
-
   return { success: true, room };
 }
 
@@ -103,26 +122,22 @@ export function removePlayer(socketId: string): {
   wasPlaying: boolean;
 } {
   for (const room of rooms.values()) {
-    const index = room.players.findIndex(
-      (player) => player.socketId === socketId,
-    ); //testar criar um map com os socketId e o index com base na entrada de player em addPlayer nas proximas versões, para o mvp isso aqui funciona
-
+    const index = room.players.findIndex((p) => p.socketId === socketId);
     if (index === -1) continue;
 
     const wasPlaying = room.status === "playing";
-
     room.players.splice(index, 1);
 
     if (room.players.length === 0) {
+      if (room.roundTimer) clearTimeout(room.roundTimer);
       const deletedRoom = { ...room };
       rooms.delete(room.code);
       return { room: deletedRoom, roomEmpty: true, wasPlaying };
     }
 
-    const ownerLeft = !room.players.some((player) => player.isOwner);
-    if (ownerLeft) {
-      room.players[0].isOwner = true;
-    }
+    const ownerLeft = !room.players.some((p) => p.isOwner);
+    if (ownerLeft) room.players[0].isOwner = true;
+
     return { room, roomEmpty: false, wasPlaying };
   }
   return { room: null, roomEmpty: false, wasPlaying: false };
@@ -135,12 +150,13 @@ export function updateRoom(
   const room = rooms.get(code);
   if (!room) return null;
   Object.assign(room, changes);
-
   return room;
 }
+
 export function roomLen() {
   return rooms.size;
 }
+
 export function deleteRoom(code: string): boolean {
   return rooms.delete(code);
 }

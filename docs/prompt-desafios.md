@@ -69,3 +69,6 @@ exemplo de desafio:
 ---
 
 Substitui `[NÚMERO]` e `[DIFICULDADE]` antes de colar. Os JSONs gerados você cola direto no `seedChallenges.ts` e roda.
+
+
+

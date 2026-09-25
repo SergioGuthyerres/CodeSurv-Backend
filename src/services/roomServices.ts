@@ -6,24 +6,20 @@ import {
   roomLen,
 } from "../store/rooms";
 import { Room } from "../store/rooms";
+
 type CreateRoomResult =
   | { success: true; room: Room }
   | { success: false; error: string };
+
 type JoinRoomResult =
   | { success: true; room: Room }
   | { success: false; error: string };
+
 function usernameValidator(username: string): boolean {
-  if (typeof username !== "string") {
-    return false;
-  }
+  if (typeof username !== "string") return false;
   const trimmed = username.trim();
-
-  if (trimmed.length < 4 || trimmed.length > 12) {
-    return false;
-  }
-
-  const regex = /^[a-zA-Z0-9]+$/;
-  return regex.test(trimmed);
+  if (trimmed.length < 4 || trimmed.length > 12) return false;
+  return /^[a-zA-Z0-9]+$/.test(trimmed);
 }
 
 export function generateRoomCode() {
@@ -35,7 +31,6 @@ export function generateRoomCode() {
   }
   let code = generateCode();
   while (getRoom(code)) {
-    //funciona so pra mvp, depois pensar em como esse loop não crashar o server
     code = generateCode();
   }
   return code;
@@ -60,13 +55,9 @@ export function serviceCreateRoom(
     return { success: false, error: "invalidUsername" };
   }
   if (typeof timeLimit !== "number" || timeLimit > 1000 || timeLimit < 60) {
-    return { success: false, error: "invalidTimeLimt" };
+    return { success: false, error: "invalidTimeLimit" };
   }
-  if (
-    typeof pointsToWin !== "number" ||
-    pointsToWin > 500 ||
-    pointsToWin < 20 //MUDAR PARA 80 ATENCAO ATENCAO ATENCAO ATENCAO ATENCAO ATENCAO _S_AD_SD_SAD__SAD_SA_D_SA_D_
-  ) {
+  if (typeof pointsToWin !== "number" || pointsToWin > 500 || pointsToWin < 80) {
     return { success: false, error: "invalidPointsToWin" };
   }
   const code = generateRoomCode();
@@ -78,7 +69,7 @@ export function serviceCreateRoom(
     password,
     timeLimit,
     pointsToWin,
-
+    solvedCount,
   );
   return { success: true, room };
 }
@@ -92,13 +83,13 @@ export function joinRoom(
   if (!usernameValidator(username)) {
     return { success: false, error: "invalidUsername" };
   }
-  const result = addPlayer(code, socketId, username, password);
-  return result;
+  return addPlayer(code, socketId, username, password);
 }
 
 export function leaveRoom(socketId: string) {
   return removePlayer(socketId);
 }
+
 export function getRoomInfo(code: string) {
   return getRoom(code);
 }
